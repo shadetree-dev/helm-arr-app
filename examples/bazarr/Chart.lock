@@ -1,6 +1,0 @@
-dependencies:
-- name: arr-common
-  repository: file://../../helm/charts/_library-charts/arr-common
-  version: 0.1.0
-digest: sha256:d5ac54986f1390dedf2958b2c2e25e6c52deab919b50e816fe5d1d4017b8c866
-generated: "2025-01-23T21:50:58.678859-07:00"
