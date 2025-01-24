@@ -1,0 +1,7 @@
+{{ include "arr-common.pvc" . }}
+---
+{{ include "arr-common.deployment" . }}
+---
+{{ include "arr-common.service" . }}
+---
+{{ include "arr-common.serviceaccount" . }}

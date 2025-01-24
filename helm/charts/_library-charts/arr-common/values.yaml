@@ -1,0 +1,178 @@
+# -- The exported values from the parent chart that are available to child charts.
+exports:
+  # -- arr-common exported default values
+  # @section -- exports
+  defaults:
+    # -- The number of replicas deployed. You should only have one because DB consistency with multiple replicas is not inherent.
+    # @section -- General Settings
+    replicaCount: 1
+
+    # -- The time in seconds for a container to be killed if it has not gracefully completed PreStop and normal termination completion.
+    # @section -- General Settings
+    terminationGracePeriod: 60
+
+    # -- The container image to use and its version
+    # @section -- General Settings
+    image:
+      # -- Always pull the image so we get the latest container image, unless you want to re-use it once downloaded.
+      # This should be a small enough image to not be a huge concern for pull rate limiting or download speed.
+      # If you have lots of failed deployments during testing of configuration and using public Docker without an account, you may want to change this.
+      # @section -- image
+      pullPolicy: Always
+      # -- The image repository for the container. By default it will use the linuxserver.io application image matching the {{ .Release.Namespace }} if nothing is provided.
+      # @section -- image
+      repository: ""
+      # -- The image tag (version) to pull. By default latest, but you can set a specific semver or tag the provider supports.
+      # @section -- image
+      tag: "latest"
+
+    # -- The k8s ServiceAccount information, if you have specific RBAC to configure.
+    # By default, this is not created and if it is does not have any special RBAC. 
+    # This chart assumes that the default (i.e. node role) will be sufficient for operation.
+    # @section -- General Settings
+    serviceAccount:
+      # -- Whether we should create a new ServiceAccount. Default is false and it is not needed.
+      # @section -- serviceAccount
+      create: false
+      # -- Automount API credentials of ServiceAccount. Only used if create is true.
+      # @section -- serviceAccount
+      automount: true
+      # -- Any annotations that should be put on the ServiceAccount.
+      # @section - serviceAccount
+      annotations: {}
+      # -- The ServiceAccount name. By default it will match the {{ .Release.Name }}
+      # @section -- serviceAccount
+      name: ""
+
+    # -- Annotations to put on the application pods.
+    # @section -- General Settings
+    podAnnotations: {}
+
+    # -- Labels to put on the application pods.
+    # By default, we identify it as an "arr-app" as part of our common configurations.
+    # @section -- General Settings
+    podLabels:
+      category: arr-app
+
+    # -- The Security Context for user/group to use for the main application container.
+    # Not used by default.
+    # @section -- General Settings
+    podSecurityContext: {}
+
+    # -- The Security Context for user/group to use for the main deployment.
+    # Not used by default.
+    # @section -- General Settings
+    securityContext: {}
+
+    # -- Configures the service to expose the application
+    # @section -- General Settings
+    service:
+      # -- Configures the application as a LoadBalancer type. 
+      # This assumes you are running a package like MetalLB(https://metallb.io/) to expose the service in your cluster via LB.
+      # @section -- service
+      type: LoadBalancer
+      # -- Sets explicit external IP addresses, if applicable.
+      # If you have automatic allocation of addresses from your LB, this may not be needed. 
+      # @section -- service
+      externalIPs: []
+
+    # -- The ports assigned to your application for exposing as a service.
+    # @section -- General Settings
+    ports: []
+
+    # -- Sets the resource requirements for the containers.
+    # @section -- General Settings
+    resources:
+      # -- Sets limits so that utilization does not exceed these values by default.
+      # @section -- resources
+      limits:
+        # -- Sets the maximum CPU limit in millicores
+        # @section -- resources
+        cpu: "500m"
+        # -- Sets the maximum memory limit (Mi, Gi, etc.).
+        # @section -- resources
+        memory: "1Gi"
+      # -- Sets the requested resource allocation for container launch.
+      # @section -- resources
+      requests:
+        # -- The CPU allocation requested at runtime in millicores.
+        # @section -- resources
+        cpu: "100m"
+        # -- The memory allocation requested at runtime (Mi, Gi, etc.).
+        # @section -- resources
+        memory: "256Mi"
+
+    # -- IGNORED, NOT IMPLEMENTED WITH HPA DUE TO SINGLE REPLICA
+    # -- Autoscaling configuration for HPA
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 1
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+
+    # -- Additional volumes to configure for the application container.
+    # @section -- General Settings
+    volumes: []
+
+    # -- Additional VolumeMounts to configure for the application container.
+    # @section -- General Settings
+    volumeMounts: []
+
+    # -- Any affinity settings for pod scheduling.
+    # @section -- General Settings
+    affinity: {}
+
+    # -- Any node scheduling selector terms for placing on specific k8s nodes.
+    # @section -- General Settings
+    nodeSelector: {}
+
+    # -- Storage configuration, which allows for maps of different types.
+    # This is intended to be iSCSI or some storage capable of POSIX locking to avoid data corruption of the SQLite DB these applications use.
+    # You should already have the StorageClass configured and available by name.
+    # While NFS should work, YMMV and you should be cautious by keeping config backups! Use at your own risk!
+    # @section -- General Settings
+    storageConfig:
+      # -- The StorageClass name for an existing StorageClass resource.
+      # Defaults to Synology as an example.
+      # @section -- storageConfig
+      storageClassName: synology-iscsi
+      # -- Reclamation policy for whether volumes will be kept or deleted when the pods are destroyed.
+      # @section -- storageConfig
+      reclaimPolicy: Retain
+      # -- The name of the PersistentVolumeClaim created.
+      # Defaults to {{ .Release.Name }}-pvc if not specified.
+      # @section -- storageConfig
+      volumeName: ""
+      # -- The mode (Filesystem or Block) for your storage. 
+      # If you are not mapping raw block storage to be initialized by the container through custom mechanisms, you should always use Filesystem.
+      # @section -- storageConfig
+      volumeMode: Filesystem
+      # -- The storage to allocate (Mi, Gi, etc.) for the data volume of the container.
+      # 10Gi should be sufficient with growth, backups, etc. for these applications unless there is some extensive use case if you are storing scripts or other resources.
+      # You can likely use 5Gi or less, if you are storage constrained. See the application documentation for your arr app of choice.
+      # @section -- storageConfig
+      volumeSize: 10Gi
+      # -- The access mode you expect the container to need.
+      # We need read and write, and since we do NOT have multi-container consistency and locking capabilities from these apps, ReadWriteOnce should be kept.
+      # @section -- storageConfig
+      accessModes:
+        - ReadWriteOnce
+
+      # -- Secondary option to configure with NFS storage
+      # IGNORED AT THIS TIME
+      ## NFS configuration
+      # storageClassName: nfs
+      # nfs:
+      #   mountOptions:
+      #     - hard
+      #     - nfsvers=4.1
+      #     - proto=tcp
+      #     - rsize=4096
+      #     - wsize=4096
+      #   nfsServer: '192.168.1.50'
+      #   volumePath: '/volume1/k8s_volumes/'
+
+    # -- Environment variables to set. If using the linuxserver.io images, PUID and PGID can be set for access to storage or system resources by setting these.
+    # @section -- General Settings
+    env: []

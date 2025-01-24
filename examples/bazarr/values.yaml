@@ -1,0 +1,42 @@
+replicaCount: 1
+terminationGracePeriod: 60
+
+image:
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  automount: true
+  annotations: {}
+  name: ""
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: LoadBalancer
+  externalIPs:
+  - '192.168.1.75'
+  
+ports:
+  - name: bazarr-web
+    containerPort: 6767
+    targetPort: 6767
+    protocol: TCP
+
+affinity: {}
+nodeSelector: {}
+
+storageConfig:
+  storageClassName: synology-iscsi
+  reclaimPolicy: Retain
+  volumeName: ""
+  volumeMode: Filesystem
+  volumeSize: 10Gi
+  accessModes:
+    - ReadWriteOnce

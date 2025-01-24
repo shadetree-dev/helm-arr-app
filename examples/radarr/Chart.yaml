@@ -1,0 +1,12 @@
+apiVersion: v2
+name: radarr
+description: Deploys Radarr for movie management
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+dependencies:
+  - name: arr-common
+    version: "0.1.0"
+    repository: "file://../../_library_charts_/arr-common"
+    import-values:
+      - defaults
