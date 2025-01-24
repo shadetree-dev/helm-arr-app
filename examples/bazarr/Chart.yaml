@@ -1,0 +1,12 @@
+apiVersion: v2
+name: bazarr
+description: Deploys Bazarr for subtitle management
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+dependencies:
+  - name: arr-common
+    version: "0.1.0"
+    repository: "file://../../helm/charts/_library-charts/arr-common"
+    import-values:
+    - defaults
